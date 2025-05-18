@@ -105,10 +105,32 @@ func rekomendasiPengeluaran(A *tabInt, jumlah int) {
 	}
 }
 
+func hapusLayanan(A *tabInt, idx int, jumlah *int) {
+	var index int = idx - 1
+	if index < 0 || index >= *jumlah {
+		fmt.Println("Nomor layanan tidak valid!")
+		return
+	}
+	var i int = index
+	for i < *jumlah-1 {
+		A[i] = A[i+1]
+		i = i + 1
+	}
+	A[*jumlah-1] = layanan_berlangganan{}
+	*jumlah = *jumlah - 1
+	i = 0
+	for i < *jumlah {
+		A[i].no = i + 1
+		i = i + 1
+	}
+	fmt.Println("Layanan berhasil dihapus!")
+}
+
+
 func menu(A tabInt){
 	var pil, isiArr int
 	pil = 0
-	for pil != 7{
+	for pil != 8{
 	fmt.Println("===================== MENU ========================")
 	fmt.Println("1. Tampilkan Daftar Layanan")
 	fmt.Println("2. Tambahkan Daftar Layanan")
@@ -116,7 +138,8 @@ func menu(A tabInt){
 	fmt.Println("4. Sort Daftar Layanan")
 	fmt.Println("5. Cek Jatuh Tempo")
 	fmt.Println("6. Rekomendasi Pengeluaran")
-	fmt.Println("7. Keluar")
+	fmt.Println("7. Hapus Layanan")
+	fmt.Println("8. Keluar")
 	fmt.Scan(&pil)
 	loadData(&A)
 	isiArr = cekIsiArray(&A)
@@ -150,6 +173,16 @@ func menu(A tabInt){
 	case 6 :
 		fmt.Println("============ REKOMENDASI PAGE ===============")
 		rekomendasiPengeluaran(&A, isiArr)
+	case 7 :
+		var index int
+		fmt.Println("============ DELETE PAGE ===============")
+		tampilkanArray(&A, isiArr)
+		fmt.Print("Baris nomor berapa yang ingin dihapus? ")
+		fmt.Scan(&index)
+		hapusLayanan(&A, index, &isiArr)
+		fmt.Println("Setelah hapus:")
+		tampilkanArray(&A, isiArr)
+		fmt.Println("data skrg = ", isiArr)
 	}
 }
 }
