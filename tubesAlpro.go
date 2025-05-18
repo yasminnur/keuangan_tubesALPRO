@@ -56,7 +56,6 @@ func cekIsiArray(A *tabInt) int {
 	var jmlh int
 	for i := 0; i < NMAX && A[i].no != 0; i++ {
 		jmlh++
-		// fmt.Println(A[i].no)
 	}
 	return jmlh
 }
@@ -126,11 +125,23 @@ func hapusLayanan(A *tabInt, idx int, jumlah *int) {
 	fmt.Println("Layanan berhasil dihapus!")
 }
 
+func searchData(A *tabInt, keyword string, jumlah int){
+	var ketemu int
+	for i:=0; i<jumlah; i++ {
+		if A[i].status == keyword || A[i].nama_layanan == keyword || A[i].tgl_pembayaran == keyword{
+			fmt.Println(A[i])
+			ketemu++
+		} 
+	}
+	if ketemu == 0 {
+		fmt.Println("Data tidak ditemukan")
+	}
+}
 
 func menu(A tabInt){
 	var pil, isiArr int
 	pil = 0
-	for pil != 8{
+	for pil != 10{
 	fmt.Println("===================== MENU ========================")
 	fmt.Println("1. Tampilkan Daftar Layanan")
 	fmt.Println("2. Tambahkan Daftar Layanan")
@@ -139,7 +150,8 @@ func menu(A tabInt){
 	fmt.Println("5. Cek Jatuh Tempo")
 	fmt.Println("6. Rekomendasi Pengeluaran")
 	fmt.Println("7. Hapus Layanan")
-	fmt.Println("8. Keluar")
+	fmt.Println("8. Search Daftar Layanan")
+	fmt.Println("9. Keluar")
 	fmt.Scan(&pil)
 	loadData(&A)
 	isiArr = cekIsiArray(&A)
@@ -183,6 +195,12 @@ func menu(A tabInt){
 		fmt.Println("Setelah hapus:")
 		tampilkanArray(&A, isiArr)
 		fmt.Println("data skrg = ", isiArr)
+	case 8 :
+		var keyword string
+		fmt.Println("============ SEARCH PAGE ===============")
+		fmt.Print("Cari data berdasarkan nama layanan / tanggal pembayaran / status : ")
+			fmt.Scan(&keyword)
+			searchData(&A, keyword, isiArr)
 	}
 }
 }
@@ -191,12 +209,11 @@ func loadData(data *tabInt){
 		{1, "aaa", 1, "ww", "20-302-0", "lunas"},
 		{2, "bbb", 8, "ww", "20-302-0", "lunas"},
 		{3, "ccc", 3, "ww", "20-302-0", "belum"},
-		{4, "ddd", 11, "ww", "20-302-0", "lunas"},
+		{4, "ddd", 11, "ww", "20-302-1", "lunas"},
 		{5, "eee", 5, "ww", "20-302-0", "lunas"},
 	}
 }
 func main() {
 	var data tabInt
-	fmt.Println("yasmin menambahkan iniiii")
 	menu(data)
 }
