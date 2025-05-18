@@ -34,6 +34,76 @@ func tampilkanArray(A *tabInt, no int) {
 	}
 	fmt.Println()
 }
+func editArray(A *tabInt, idx int) {
+	fmt.Println("======== EDIT ========")
+	idx = idx-1
+	fmt.Print("Nama Layanan: ")
+	fmt.Scan(&A[idx].nama_layanan)
+	// fmt.Println()
+	fmt.Print("biaya : ")
+	fmt.Scan(&A[idx].biaya)
+	fmt.Print("Metode Pembayaran : ")
+	fmt.Scan(&A[idx].metode_pembayaran)
+	// fmt.Println()
+	fmt.Print("Tanggal Pembayaran : ")
+	fmt.Scan(&A[idx].tgl_pembayaran)
+	// fmt.Println()
+	fmt.Print("Status : ")
+	fmt.Scan(&A[idx].status)
+	fmt.Println()
+}
+func cekIsiArray(A *tabInt) int {
+	var jmlh int
+	for i := 0; i < NMAX && A[i].no != 0; i++ {
+		jmlh++
+		// fmt.Println(A[i].no)
+	}
+	return jmlh
+}
+func sortArray(A *tabInt, jumlah int){
+	// DESCENDING (Besar ke Kecil)
+	var i int = 0
+	for i < jumlah-1 {
+		var maxIdx int = i
+		var j int = i + 1
+		for j < jumlah {
+			if A[j].biaya > A[maxIdx].biaya {
+				maxIdx = j
+			}
+			j = j + 1
+		}
+		var temp layanan_berlangganan = A[i]
+		A[i] = A[maxIdx]
+		A[maxIdx] = temp
+		i = i + 1
+	}
+}
+func cekJatuhTempo(A *tabInt, jumlah int) {
+	var hariIni string
+	fmt.Print("Masukkan tanggal hari ini (YYYY-MM-DD): ")
+	fmt.Scan(&hariIni)
+
+	fmt.Println("⏰ Pengeluaran mendekati jatuh tempo:")
+	var i int = 0
+	for i < jumlah {
+		if A[i].status == "belum" || A[i].status == "belum bayar" {
+			if *&A[i].tgl_pembayaran <= hariIni {
+				fmt.Println("- ", A[i].nama_layanan, "(", A[i].tgl_pembayaran, ")")
+			}
+		}
+		i = i + 1
+	}
+}
+func rekomendasiPengeluaran(A *tabInt, jumlah int) {
+	fmt.Println("📉 Rekomendasi pengeluaran yang bisa dikurangi:")
+	var i int = 0
+	for i < jumlah {
+		if A[i].biaya > 100000 {
+			fmt.Println("- ", A[i].nama_layanan, "(", A[i].biaya, ")")
+		}
+		i = i + 1
+	}
+}
 
 func menu(A tabInt){
 	var pil, isiArr int
