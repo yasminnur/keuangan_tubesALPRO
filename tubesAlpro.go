@@ -164,5 +164,6 @@ func loadData(data *tabInt){
 }
 func main() {
 	var data tabInt
+	fmt.Println("yasmin menambahkan iniiii")
 	menu(data)
 }
