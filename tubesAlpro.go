@@ -161,11 +161,28 @@ func cekJatuhTempo(A *tabInt, jumlah int) {
 }
 
 func rekomendasiPengeluaran(A *tabInt, jumlah int) {
-	fmt.Println("📉 Rekomendasi pengeluaran yang bisa dikurangi:")
-	var i int = 0
+	fmt.Println("📉 Rekomendasi layanan yang dapat dihentikan berdasarkan harga termahal:")
+	if jumlah == 0 {
+		fmt.Println("Tidak ada layanan yang tersedia")
+		return
+	}
+	
+	// Mencari harga termahal
+	var hargaTermahal int = A[0].biaya
+	var i int = 1
 	for i < jumlah {
-		if A[i].biaya > 100000 {
-			fmt.Println("- ", A[i].nama_layanan, "(", A[i].biaya, ")")
+		if A[i].biaya > hargaTermahal {
+			hargaTermahal = A[i].biaya
+		}
+		i = i + 1
+	}
+	
+	// Menampilkan layanan dengan harga termahal
+	fmt.Printf("Layanan dengan biaya termahal (Rp%d):\n", hargaTermahal)
+	i = 0
+	for i < jumlah {
+		if A[i].biaya == hargaTermahal {
+			fmt.Printf("- %s (Rp%d)\n", A[i].nama_layanan, A[i].biaya)
 		}
 		i = i + 1
 	}
@@ -189,7 +206,6 @@ func hapusLayanan(A *tabInt, idx int, jumlah *int) {
 		A[i].no = i + 1
 		i = i + 1
 	}
-	*jumlah--
 	fmt.Println("Layanan berhasil dihapus!")
 }
 
