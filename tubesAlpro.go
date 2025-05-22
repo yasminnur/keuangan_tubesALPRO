@@ -1,8 +1,10 @@
 package main
+
 import (
 	"fmt"
 	"time"
 )
+
 type layanan_berlangganan struct {
 	no                int
 	nama_layanan      string
@@ -11,9 +13,13 @@ type layanan_berlangganan struct {
 	tgl_pembayaran    string
 	status            string
 }
+
 const NMAX int = 10
+
 type tabInt [NMAX]layanan_berlangganan
+
 var jumlah int = 0
+
 func ValidateDate(dateStr string, layout string) bool {
 	_, err := time.Parse(layout, dateStr)
 	return err == nil
@@ -48,11 +54,11 @@ func tambahLayanan(A *tabInt, tabungan int, jumlah *int) {
 			fmt.Printf("%-35s: ", "Metode Pembayaran (cash/transfer)")
 			fmt.Scan(&A[idx].metode_pembayaran)
 		}
-		fmt.Printf("%-35s: ", "Tanggal Pembayaran (tgl bln thn)")
+		fmt.Printf("%-35s: ", "Tanggal Pembayaran (dd-mm-yyyy)")
 		fmt.Scan(&A[idx].tgl_pembayaran)
 		for !IsDateValid(A[idx].tgl_pembayaran) {
 			fmt.Println("Input tidak valid!")
-			fmt.Printf("%-35s: ", "Tanggal Pembayaran (tgl bln thn)")
+			fmt.Printf("%-35s: ", "Tanggal Pembayaran (dd-mm-yyyy)")
 			fmt.Scan(&A[idx].tgl_pembayaran)
 		}
 		fmt.Printf("%-35s: ", "Status (Lunas/Belum)")
@@ -63,12 +69,11 @@ func tambahLayanan(A *tabInt, tabungan int, jumlah *int) {
 			fmt.Printf("%-35s: ", "Status (Lunas/Belum)")
 			fmt.Scan(&A[idx].status)
 		}
-		*jumlah = *jumlah + 1
 		A[idx].no = idx + 1
-
+		*jumlah = *jumlah + 1
+		fmt.Println("=======================================")
+		fmt.Println("Selamat! Anda berhasil menambahkan data")
 	}
-	fmt.Println("=======================================")
-	fmt.Println("Selamat! Anda berhasil menambahkan data")
 }
 
 func tampilkanArray(A tabInt, jumlah int) {
@@ -81,46 +86,58 @@ func tampilkanArray(A tabInt, jumlah int) {
 	fmt.Println("Jumlah Data : ", jumlah)
 }
 
-func editArray(A *tabInt, idx int) {
+func editArray(A *tabInt, tabungan int, idx int, jumlah *int) {
 	fmt.Println("======== EDIT ========")
 	idx = idx - 1
+	if idx < 0 || idx >= *jumlah {
+		fmt.Println("Nomor layanan tidak valid!")
+		return
+	}
+	
 	fmt.Printf("%-35s: ", "Nama Layanan")
 	fmt.Scan(&A[idx].nama_layanan)
-	fmt.Print("biaya : ")
+	fmt.Print("Biaya : ")
 	fmt.Scan(&A[idx].biaya)
-	_, utang := hitUtang(*A, tabungan, *jumlah)
-	if utang+A[indeks].biaya > tabungan {
-		fmt.Println("Saldo anda tidak cukup")
-	} else {
-		fmt.Printf("%-35s: ", "Metode Pembayaran (cash/transfer)")
-		fmt.Scan(&A[indeks].metode_pembayaran)
-		for A[indeks].metode_pembayaran != "cash" && A[indeks].metode_pembayaran != "transfer" {
-			fmt.Println("Input tidak valid!")
-			fmt.Println("Mohon lakukan pengisian ulang sesuai aturan pilihan yang tertera")
-			fmt.Printf("%-35s: ", "Metode Pembayaran (cash/transfer)")
-			fmt.Scan(&A[indeks].metode_pembayaran)
+	
+	// Hitung utang tanpa item yang sedang diedit
+	utangLain := 0
+	for i := 0; i < *jumlah; i++ {
+		if i != idx && A[i].status != "Lunas" && A[i].status != "lunas" {
+			utangLain += A[i].biaya
 		}
-		fmt.Printf("%-35s: ", "Tanggal Pembayaran (tgl bln thn)")
-		fmt.Scan(&A[indeks].tgl_pembayaran)
-		for !IsDateValid(A[indeks].tgl_pembayaran) {
-			fmt.Println("Input tidak valid!")
-			fmt.Printf("%-35s: ", "Tanggal Pembayaran (tgl bln thn)")
-			fmt.Scan(&A[indeks].tgl_pembayaran)
-		}
-		fmt.Printf("%-35s: ", "Status (Lunas/Belum)")
-		fmt.Scan(&A[indeks].status)
-		for A[indeks].status != "Lunas" && A[indeks].status != "Belum" {
-			fmt.Println("Input tidak valid!")
-			fmt.Println("Mohon lakukan pengisian ulang sesuai aturan pilihan yang tertera")
-			fmt.Printf("%-35s: ", "Status (Lunas/Belum)")
-			fmt.Scan(&A[indeks].status)
-		}
-		*jumlah = *jumlah + 1
-		A[indeks].no = indeks + 1
 	}
+	
+	if utangLain+A[idx].biaya > tabungan {
+		fmt.Println("Saldo anda tidak cukup")
+		return
+	}
+	
+	fmt.Printf("%-35s: ", "Metode Pembayaran (cash/transfer)")
+	fmt.Scan(&A[idx].metode_pembayaran)
+	for A[idx].metode_pembayaran != "cash" && A[idx].metode_pembayaran != "transfer" {
+		fmt.Println("Input tidak valid!")
+		fmt.Println("Mohon lakukan pengisian ulang sesuai aturan pilihan yang tertera")
+		fmt.Printf("%-35s: ", "Metode Pembayaran (cash/transfer)")
+		fmt.Scan(&A[idx].metode_pembayaran)
+	}
+	fmt.Printf("%-35s: ", "Tanggal Pembayaran (dd-mm-yyyy)")
+	fmt.Scan(&A[idx].tgl_pembayaran)
+	for !IsDateValid(A[idx].tgl_pembayaran) {
+		fmt.Println("Input tidak valid!")
+		fmt.Printf("%-35s: ", "Tanggal Pembayaran (dd-mm-yyyy)")
+		fmt.Scan(&A[idx].tgl_pembayaran)
+	}
+	fmt.Printf("%-35s: ", "Status (Lunas/Belum)")
+	fmt.Scan(&A[idx].status)
+	for A[idx].status != "Lunas" && A[idx].status != "Belum" {
+		fmt.Println("Input tidak valid!")
+		fmt.Println("Mohon lakukan pengisian ulang sesuai aturan pilihan yang tertera")
+		fmt.Printf("%-35s: ", "Status (Lunas/Belum)")
+		fmt.Scan(&A[idx].status)
+	}
+	
 	fmt.Println("=======================================")
-	fmt.Println("Selamat! Anda berhasil menambahkan data")
-}
+	fmt.Println("Selamat! Anda berhasil mengedit data")
 }
 
 func cekIsiArray(A *tabInt) int {
@@ -153,16 +170,23 @@ func cekJatuhTempo(A *tabInt, jumlah int) {
 	var hariIni string
 	hariIni = "20-05-2025"
 	fmt.Println("⏰ Pengeluaran mendekati jatuh tempo: ")
+	
+	found := false
 	for i := 0; i < jumlah; i++ {
-		if (A[i].status) != "lunas" {
+		if A[i].status != "Lunas" && A[i].status != "lunas" {
 			if A[i].tgl_pembayaran <= hariIni {
-				fmt.Println("⚠️ Sudah lewat:", A[i].nama_layanan)
+				fmt.Printf("⚠️ Sudah lewat: %s (Tanggal: %s)\n", A[i].nama_layanan, A[i].tgl_pembayaran)
+				found = true
 			} else {
-				fmt.Println("⏰ Mendekati:", A[i].nama_layanan)
+				fmt.Printf("⏰ Mendekati: %s (Tanggal: %s)\n", A[i].nama_layanan, A[i].tgl_pembayaran)
+				found = true
 			}
 		}
 	}
-
+	
+	if !found {
+		fmt.Println("Tidak ada layanan yang mendekati jatuh tempo")
+	}
 }
 
 func rekomendasiPengeluaran(A *tabInt, jumlah int) {
@@ -212,24 +236,29 @@ func hapusLayanan(A *tabInt, idx int, jumlah *int) {
 
 func searchData(A *tabInt, keyword string, jumlah int) {
 	var ketemu int
+	fmt.Printf("%-4s %-20s %-12s %-10s %-20s %-10s\n", "No", "Nama Layanan", "Biaya", "Metode", "Tanggal Pembayaran", "Status")
+	fmt.Println("------------------------------------------------------------------------------------")
 	for i := 0; i < jumlah; i++ {
 		if A[i].status == keyword || A[i].nama_layanan == keyword || A[i].tgl_pembayaran == keyword {
-			fmt.Println(A[i])
+			fmt.Printf("%-4d %-20s Rp%-10d %-10s %-20s %-10s\n", A[i].no, A[i].nama_layanan, A[i].biaya, A[i].metode_pembayaran, A[i].tgl_pembayaran, A[i].status)
 			ketemu++
 		}
 	}
 	if ketemu == 0 {
 		fmt.Println("Data tidak ditemukan")
+	} else {
+		fmt.Printf("\nDitemukan %d data\n", ketemu)
 	}
 }
 
-func menu(A tabInt) {
+func menu(A *tabInt) {
 	var pil, isiArr int
 	var tabungan int
 	tabungan = 50000
 	pil = 0
-	loadData(&A)
-	isiArr = cekIsiArray(&A)
+	loadData(A)
+	isiArr = cekIsiArray(A)
+	
 	for pil != 9 {
 		fmt.Println()
 		fmt.Println("===================== MENU ========================")
@@ -237,7 +266,7 @@ func menu(A tabInt) {
 		fmt.Println("2. Tambahkan Daftar Layanan")
 		fmt.Println("3. Edit Daftar Layanan")
 		fmt.Println("4. Sort Daftar Layanan")
-		fmt.Println("5. Cek Jatuh Tempo") //
+		fmt.Println("5. Cek Jatuh Tempo")
 		fmt.Println("6. Rekomendasi Pengeluaran")
 		fmt.Println("7. Hapus Layanan")
 		fmt.Println("8. Search Daftar Layanan")
@@ -246,12 +275,11 @@ func menu(A tabInt) {
 		fmt.Print("Pilih : ")
 		fmt.Scan(&pil)
 		fmt.Println()
-		fmt.Println()
+		
 		switch pil {
 		case 1:
 			fmt.Println("============ DATA PAGE ===============")
-			fmt.Println("is = ", isiArr)
-			tampilkanArray(A, isiArr)
+			tampilkanArray(*A, isiArr)
 		case 2:
 			fmt.Println("============ ADD PAGE ===============")
 			var move string
@@ -264,80 +292,78 @@ func menu(A tabInt) {
 				if move == "Ya" {
 					fmt.Print("Baris nomor berapa yang ingin dihapus? ")
 					fmt.Scan(&index)
-					hapusLayanan(&A, index, &isiArr)
+					hapusLayanan(A, index, &isiArr)
 				}
 			}
-			ok, _ := hitUtang(A, tabungan, isiArr)
-			_, utang := hitUtang(A, tabungan, isiArr)
+			ok, utang := hitUtang(*A, tabungan, isiArr)
 			if ok {
-				tambahLayanan(&A, tabungan, &isiArr)
+				tambahLayanan(A, tabungan, &isiArr)
 			} else {
 				fmt.Println("Saldo anda tidak cukup!")
 				fmt.Println("Uang anda saat ini: ", tabungan)
 				fmt.Println("Layanan yang belum dibayar: ", utang)
 			}
-			tampilkanArray(A, isiArr)
+			tampilkanArray(*A, isiArr)
 		case 3:
 			var index int
-			tampilkanArray(A, isiArr)
+			tampilkanArray(*A, isiArr)
 			fmt.Println("============ EDIT PAGE ===============")
 			fmt.Print("Baris nomor berapa yang ingin diubah? ")
 			fmt.Scan(&index)
-			fmt.Println("Sebelum edit ")
-			fmt.Println(A)
-			editArray(&A, index)
-			fmt.Println("Sesudah edit ")
-			fmt.Println(A)
+			editArray(A, tabungan, index, &isiArr)
+			tampilkanArray(*A, isiArr)
 		case 4:
 			fmt.Println("============ SORT PAGE ===============")
-			sortArray(&A, isiArr)
-			tampilkanArray(A, isiArr)
+			sortArray(A, isiArr)
+			tampilkanArray(*A, isiArr)
 		case 5:
 			fmt.Println("============ CEK JATUH TEMPO PAGE ===============")
-			cekJatuhTempo(&A, isiArr)
+			cekJatuhTempo(A, isiArr)
 		case 6:
 			fmt.Println("============ REKOMENDASI PAGE ===============")
-			rekomendasiPengeluaran(&A, isiArr)
+			rekomendasiPengeluaran(A, isiArr)
 		case 7:
 			var index int
-			tampilkanArray(A, isiArr)
+			tampilkanArray(*A, isiArr)
 			fmt.Println("============ DELETE PAGE ===============")
-			tampilkanArray(A, isiArr)
 			fmt.Print("Baris nomor berapa yang ingin dihapus? ")
 			fmt.Scan(&index)
-			hapusLayanan(&A, index, &isiArr)
+			hapusLayanan(A, index, &isiArr)
 			fmt.Println("Setelah hapus:")
-			tampilkanArray(A, isiArr)
+			tampilkanArray(*A, isiArr)
 		case 8:
 			var keyword string
 			fmt.Println("============ SEARCH PAGE ===============")
 			fmt.Print("Cari data berdasarkan nama layanan / tanggal pembayaran / status : ")
 			fmt.Scan(&keyword)
-			searchData(&A, keyword, isiArr)
+			searchData(A, keyword, isiArr)
+		case 9:
+			fmt.Println("Terima kasih telah menggunakan program ini!")
+		default:
+			fmt.Println("Pilihan tidak valid!")
 		}
 	}
 }
 
 func loadData(data *tabInt) {
 	*data = tabInt{
-		{1, "aaa", 10000, "ww", "20-12-1001", "lunas"},
-		{2, "bbb", 8000, "ww", "19-05-2025", "belum"},
-		{3, "ccc", 30000, "ww", "20-02-2929", "belum"},
-		{4, "ddd", 1100, "ww", "20-12-1999", "lunas"},
-		{5, "eee", 5000, "ww", "20-12-9292", "lunas"},
-		{6, "eee", 5000, "ww", "20-11-2000", "lunas"},
+		{1, "Netflix", 10000, "transfer", "25-05-2025", "Belum"},
+		{2, "Spotify", 8000, "cash", "19-05-2025", "Belum"},
+		{3, "YouTube Premium", 30000, "transfer", "30-05-2025", "Belum"},
+		{4, "Disney+", 1100, "cash", "15-06-2025", "Lunas"},
+		{5, "Amazon Prime", 5000, "transfer", "20-06-2025", "Lunas"},
+		{6, "HBO Max", 5000, "cash", "25-06-2025", "Lunas"},
 	}
 }
 
 func hitUtang(A tabInt, tabungan, jumlah int) (bool, int) {
 	var utang int
 	for i := 0; i < jumlah; i++ {
-		if A[i].status != "lunas" {
+		if A[i].status != "Lunas" && A[i].status != "lunas" {
 			utang += A[i].biaya
 		}
 	}
-	total := utang + 10000
-	return total < tabungan, total
+	return utang < tabungan, utang
 }
 
 func hitPengeluaran(A tabInt, jumlah int) int {
@@ -350,9 +376,6 @@ func hitPengeluaran(A tabInt, jumlah int) int {
 
 func main() {
 	var data tabInt
-	menu(data)
+	menu(&data)
+	//sss
 }
-
-// jatuh tempo = berdasarkan biaya layanan terbesar
-// rekomendasi = biaya terbesar
-// hitung pengeluaran perbulan yg udah lunas
