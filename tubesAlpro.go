@@ -94,22 +94,21 @@ func editArray(A *tabInt, tabungan int, idx int, jumlah *int) {
 		return
 	}
 	
+	// Simpan biaya lama untuk perhitungan saldo
+	biayaLama := A[idx].biaya
+	statusLama := A[idx].status
+	
 	fmt.Printf("%-35s: ", "Nama Layanan")
 	fmt.Scan(&A[idx].nama_layanan)
-	fmt.Print("Biaya : ")
+	fmt.Printf("%-35s: ", "Biaya")
 	fmt.Scan(&A[idx].biaya)
 	
-	// Hitung utang tanpa item yang sedang diedit
-	utangLain := 0
+	// Hitung total utang saat ini (tidak termasuk item yang sedang diedit)
+	totalUtangLain := 0
 	for i := 0; i < *jumlah; i++ {
-		if i != idx && A[i].status != "Lunas" && A[i].status != "lunas" {
-			utangLain += A[i].biaya
+		if i != idx && (A[i].status == "Belum" || A[i].status == "belum") {
+			totalUtangLain += A[i].biaya
 		}
-	}
-	
-	if utangLain+A[idx].biaya > tabungan {
-		fmt.Println("Saldo anda tidak cukup")
-		return
 	}
 	
 	fmt.Printf("%-35s: ", "Metode Pembayaran (cash/transfer)")
@@ -120,6 +119,7 @@ func editArray(A *tabInt, tabungan int, idx int, jumlah *int) {
 		fmt.Printf("%-35s: ", "Metode Pembayaran (cash/transfer)")
 		fmt.Scan(&A[idx].metode_pembayaran)
 	}
+	
 	fmt.Printf("%-35s: ", "Tanggal Pembayaran (dd-mm-yyyy)")
 	fmt.Scan(&A[idx].tgl_pembayaran)
 	for !IsDateValid(A[idx].tgl_pembayaran) {
@@ -127,6 +127,7 @@ func editArray(A *tabInt, tabungan int, idx int, jumlah *int) {
 		fmt.Printf("%-35s: ", "Tanggal Pembayaran (dd-mm-yyyy)")
 		fmt.Scan(&A[idx].tgl_pembayaran)
 	}
+	
 	fmt.Printf("%-35s: ", "Status (Lunas/Belum)")
 	fmt.Scan(&A[idx].status)
 	for A[idx].status != "Lunas" && A[idx].status != "Belum" {
@@ -134,6 +135,21 @@ func editArray(A *tabInt, tabungan int, idx int, jumlah *int) {
 		fmt.Println("Mohon lakukan pengisian ulang sesuai aturan pilihan yang tertera")
 		fmt.Printf("%-35s: ", "Status (Lunas/Belum)")
 		fmt.Scan(&A[idx].status)
+	}
+	
+	// Cek saldo setelah semua input selesai
+	totalUtangBaru := totalUtangLain
+	if A[idx].status == "Belum" || A[idx].status == "belum" {
+		totalUtangBaru += A[idx].biaya
+	}
+	
+	if totalUtangBaru > tabungan {
+		fmt.Println("Saldo anda tidak cukup dengan perubahan ini!")
+		fmt.Printf("Total utang akan menjadi: Rp%d, sedangkan saldo: Rp%d\n", totalUtangBaru, tabungan)
+		// Kembalikan nilai lama
+		A[idx].biaya = biayaLama
+		A[idx].status = statusLama
+		return
 	}
 	
 	fmt.Println("=======================================")
@@ -407,5 +423,4 @@ func hitPengeluaran(A tabInt, jumlah int) int {
 func main() {
 	var data tabInt
 	menu(&data)
-	//sss
 }
