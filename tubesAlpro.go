@@ -1,10 +1,8 @@
 package main
-
 import (
 	"fmt"
 	"time"
 )
-
 type layanan_berlangganan struct {
 	no                int
 	nama_layanan      string
@@ -13,42 +11,27 @@ type layanan_berlangganan struct {
 	tgl_pembayaran    string
 	status            string
 }
-
 const NMAX int = 10
-
 type tabInt [NMAX]layanan_berlangganan
-
 var jumlah int = 0
-
-// ValidateDate memeriksa apakah string tanggal valid sesuai format yang diberikan
 func ValidateDate(dateStr string, layout string) bool {
 	_, err := time.Parse(layout, dateStr)
 	return err == nil
 }
 
-// IsDateValid memeriksa apakah tanggal dalam format DD-MM-YYYY valid
 func IsDateValid(dateStr string) bool {
-	// Format tanggal: DD-MM-YYYY
-	layout := "02-01-2006" // Format Go untuk DD-MM-YYYY
-	// Coba parsing tanggal
+	layout := "02-01-2006"
 	t, err := time.Parse(layout, dateStr)
 	if err != nil {
 		return false
 	}
-	// Periksa apakah tanggal hasil parsing sama dengan input
-	// Ini untuk menangani kasus seperti 31-02-2022 (31 Februari)
-	// yang akan di-normalize menjadi tanggal lain oleh Go
 	checkStr := t.Format(layout)
 	return checkStr == dateStr
 }
 
 func tambahLayanan(A *tabInt, tabungan int, jumlah *int) {
-	// A[*jumlah].no = *no + 1
 	var indeks int
 	indeks = *jumlah
-
-	// Set nomor untuk data baru
-	// A[indeks].no = indeks + 1
 	fmt.Printf("%-35s: ", "Nama Layanan")
 	fmt.Scan(&A[indeks].nama_layanan)
 	fmt.Printf("%-35s: ", "Harga")
@@ -82,7 +65,6 @@ func tambahLayanan(A *tabInt, tabungan int, jumlah *int) {
 		}
 		*jumlah = *jumlah + 1
 		A[indeks].no = indeks + 1
-
 	}
 	fmt.Println("=======================================")
 	fmt.Println("Selamat! Anda berhasil menambahkan data")
@@ -123,7 +105,6 @@ func cekIsiArray(A *tabInt) int {
 }
 
 func sortArray(A *tabInt, jumlah int) {
-	// DESCENDING (Besar ke Kecil)
 	var i int = 0
 	for i < jumlah-1 {
 		var maxIdx int = i
@@ -143,10 +124,7 @@ func sortArray(A *tabInt, jumlah int) {
 
 func cekJatuhTempo(A *tabInt, jumlah int) {
 	var hariIni string
-	// fmt.Print("Masukkan tanggal hari ini (YYYY-MM-DD): ")
-	// fmt.Scan(&hariIni)
 	hariIni = "20-05-2025"
-
 	fmt.Println("⏰ Pengeluaran mendekati jatuh tempo: ")
 	for i := 0; i < jumlah; i++ {
 		if (A[i].status) != "lunas" {
@@ -166,8 +144,6 @@ func rekomendasiPengeluaran(A *tabInt, jumlah int) {
 		fmt.Println("Tidak ada layanan yang tersedia")
 		return
 	}
-	
-	// Mencari harga termahal
 	var hargaTermahal int = A[0].biaya
 	var i int = 1
 	for i < jumlah {
@@ -176,8 +152,6 @@ func rekomendasiPengeluaran(A *tabInt, jumlah int) {
 		}
 		i = i + 1
 	}
-	
-	// Menampilkan layanan dengan harga termahal
 	fmt.Printf("Layanan dengan biaya termahal (Rp%d):\n", hargaTermahal)
 	i = 0
 	for i < jumlah {
@@ -236,7 +210,7 @@ func menu(A tabInt) {
 		fmt.Println("2. Tambahkan Daftar Layanan")
 		fmt.Println("3. Edit Daftar Layanan")
 		fmt.Println("4. Sort Daftar Layanan")
-		fmt.Println("5. Cek Jatuh Tempo")
+		fmt.Println("5. Cek Jatuh Tempo") //
 		fmt.Println("6. Rekomendasi Pengeluaran")
 		fmt.Println("7. Hapus Layanan")
 		fmt.Println("8. Search Daftar Layanan")
@@ -244,7 +218,6 @@ func menu(A tabInt) {
 		fmt.Println("====================================================")
 		fmt.Print("Pilih : ")
 		fmt.Scan(&pil)
-
 		fmt.Println()
 		fmt.Println()
 		switch pil {
@@ -318,12 +291,12 @@ func menu(A tabInt) {
 
 func loadData(data *tabInt) {
 	*data = tabInt{
-		{1, "aaa", 10000, "ww", "20-302-0", "lunas"},
+		{1, "aaa", 10000, "ww", "20-12-1001", "lunas"},
 		{2, "bbb", 8000, "ww", "19-05-2025", "belum"},
-		{3, "ccc", 30000, "ww", "20-302-0", "belum"},
-		{4, "ddd", 1100, "ww", "20-302-1", "lunas"},
-		{5, "eee", 5000, "ww", "20-302-0", "lunas"},
-		{6, "eee", 5000, "ww", "20-302-0", "lunas"},
+		{3, "ccc", 30000, "ww", "20-02-2929", "belum"},
+		{4, "ddd", 1100, "ww", "20-12-1999", "lunas"},
+		{5, "eee", 5000, "ww", "20-12-9292", "lunas"},
+		{6, "eee", 5000, "ww", "20-11-2000", "lunas"},
 	}
 }
 
@@ -350,3 +323,7 @@ func main() {
 	var data tabInt
 	menu(data)
 }
+
+// jatuh tempo = berdasarkan biaya layanan terbesar
+// rekomendasi = biaya terbesar
+// hitung pengeluaran perbulan yg udah lunas
