@@ -407,4 +407,5 @@ func hitPengeluaran(A tabInt, jumlah int) int {
 func main() {
 	var data tabInt
 	menu(&data)
+	//sss
 }
