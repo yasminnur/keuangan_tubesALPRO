@@ -164,28 +164,52 @@ func sortArray(A *tabInt, jumlah int) {
 		A[maxIdx] = temp
 		i = i + 1
 	}
+	// Setelah sort, perbaiki nomor urut
+	reorderNumbers(A, jumlah)
+}
+
+// Fungsi untuk menghitung selisih hari antara dua tanggal
+func hitungSelisihHari(tanggal1, tanggal2 string) int {
+	layout := "02-01-2006"
+	t1, err1 := time.Parse(layout, tanggal1)
+	t2, err2 := time.Parse(layout, tanggal2)
+	
+	if err1 != nil || err2 != nil {
+		return 0
+	}
+	
+	selisih := t2.Sub(t1)
+	return int(selisih.Hours() / 24)
 }
 
 func cekJatuhTempo(A *tabInt, jumlah int) {
 	var hariIni string
 	hariIni = "20-05-2025"
-	fmt.Println("⏰ Pengeluaran mendekati jatuh tempo: ")
+	fmt.Println("⏰ Status jatuh tempo layanan: ")
 	
 	found := false
 	for i := 0; i < jumlah; i++ {
 		if A[i].status != "Lunas" && A[i].status != "lunas" {
-			if A[i].tgl_pembayaran <= hariIni {
-				fmt.Printf("⚠️ Sudah lewat: %s (Tanggal: %s)\n", A[i].nama_layanan, A[i].tgl_pembayaran)
+			selisihHari := hitungSelisihHari(hariIni, A[i].tgl_pembayaran)
+			
+			if selisihHari < 0 {
+				fmt.Printf("⚠️ Sudah lewat: %s (Tanggal: %s) - Terlambat %d hari\n", A[i].nama_layanan, A[i].tgl_pembayaran, -selisihHari)
+				found = true
+			} else if selisihHari <= 7 {
+				fmt.Printf("⏰ Mendekati: %s (Tanggal: %s) - %d hari lagi\n", A[i].nama_layanan, A[i].tgl_pembayaran, selisihHari)
+				found = true
+			} else if selisihHari <= 30 {
+				fmt.Printf("📅 Dalam waktu dekat: %s (Tanggal: %s) - %d hari lagi\n", A[i].nama_layanan, A[i].tgl_pembayaran, selisihHari)
 				found = true
 			} else {
-				fmt.Printf("⏰ Mendekati: %s (Tanggal: %s)\n", A[i].nama_layanan, A[i].tgl_pembayaran)
+				fmt.Printf("📆 Masih lama: %s (Tanggal: %s) - %d hari lagi\n", A[i].nama_layanan, A[i].tgl_pembayaran, selisihHari)
 				found = true
 			}
 		}
 	}
 	
 	if !found {
-		fmt.Println("Tidak ada layanan yang mendekati jatuh tempo")
+		fmt.Println("Tidak ada layanan yang belum lunas")
 	}
 }
 
@@ -213,6 +237,13 @@ func rekomendasiPengeluaran(A *tabInt, jumlah int) {
 	}
 }
 
+// Fungsi untuk mengurutkan ulang nomor setelah hapus/edit
+func reorderNumbers(A *tabInt, jumlah int) {
+	for i := 0; i < jumlah; i++ {
+		A[i].no = i + 1
+	}
+}
+
 func hapusLayanan(A *tabInt, idx int, jumlah *int) {
 	var index int = idx - 1
 	if index < 0 || index >= *jumlah {
@@ -226,11 +257,10 @@ func hapusLayanan(A *tabInt, idx int, jumlah *int) {
 	}
 	A[*jumlah-1] = layanan_berlangganan{}
 	*jumlah = *jumlah - 1
-	i = 0
-	for i < *jumlah {
-		A[i].no = i + 1
-		i = i + 1
-	}
+	
+	// Perbaiki nomor urut setelah hapus
+	reorderNumbers(A, *jumlah)
+	
 	fmt.Println("Layanan berhasil dihapus!")
 }
 
