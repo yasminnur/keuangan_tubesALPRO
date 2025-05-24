@@ -45,6 +45,7 @@ func tambahLayanan(A *tabInt, tabungan int, jumlah *int) {
 	_, utang := hitUtang(*A, tabungan, *jumlah)
 	if utang+A[idx].biaya > tabungan {
 		fmt.Println("Saldo anda tidak cukup")
+		fmt.Println()
 	} else {
 		fmt.Printf("%-35s: ", "Metode Pembayaran (cash/transfer)")
 		fmt.Scan(&A[idx].metode_pembayaran)
@@ -86,23 +87,44 @@ func tampilkanArray(A tabInt, jumlah int) {
 	fmt.Println("Jumlah Data : ", jumlah)
 }
 
-func editArray(A *tabInt, tabungan int, idx int, jumlah *int) {
+func editArray(A *tabInt, tabungan int, idx int, jumlah *int) bool {
 	fmt.Println("======== EDIT ========")
 	if idx < 0 || idx >= *jumlah {
 		fmt.Println("Nomor layanan tidak valid!")
-		return
+		return false
 	}
 
-	// Simpan biaya lama untuk perhitungan saldo
-	biayaLama := A[idx].biaya
-	statusLama := A[idx].status
+	dataAsli := A[idx]
+	var namaLayanan, metodePembayaran, tglPembayaran, status string
+	var biaya int
+	var konfirmasi string
+
+	fmt.Printf("Data saat ini: %s - Rp%d - %s - %s - %s\n", 
+		A[idx].nama_layanan, A[idx].biaya, A[idx].metode_pembayaran, 
+		A[idx].tgl_pembayaran, A[idx].status)
+	fmt.Println("Ketik 'back' pada input apapun untuk kembali ke menu")
+	fmt.Println()
 
 	fmt.Printf("%-35s: ", "Nama Layanan")
-	fmt.Scan(&A[idx].nama_layanan)
-	fmt.Printf("%-35s: ", "Biaya")
-	fmt.Scan(&A[idx].biaya)
+	fmt.Scan(&namaLayanan)
+	if namaLayanan == "back" {
+		fmt.Println("Kembali ke menu...")
+		return true
+	}
 
-	// Hitung total utang saat ini (tidak termasuk item yang sedang diedit)
+	fmt.Printf("%-35s: ", "Biaya")
+	fmt.Scan(&biaya)
+	if biaya == 0 {
+		var biayaStr string
+		fmt.Printf("%-35s: ", "Biaya")
+		fmt.Scan(&biayaStr)
+		if biayaStr == "back" {
+			fmt.Println("Kembali ke menu...")
+			return true
+		}
+		fmt.Sscanf(biayaStr, "%d", &biaya)
+	}
+
 	totalUtangLain := 0
 	for i := 0; i < *jumlah; i++ {
 		if i != idx && (A[i].status == "Belum" || A[i].status == "belum") {
@@ -111,48 +133,89 @@ func editArray(A *tabInt, tabungan int, idx int, jumlah *int) {
 	}
 
 	fmt.Printf("%-35s: ", "Metode Pembayaran (cash/transfer)")
-	fmt.Scan(&A[idx].metode_pembayaran)
-	for A[idx].metode_pembayaran != "cash" && A[idx].metode_pembayaran != "transfer" {
+	fmt.Scan(&metodePembayaran)
+	if metodePembayaran == "back" {
+		fmt.Println("Kembali ke menu...")
+		return true
+	}
+	for metodePembayaran != "cash" && metodePembayaran != "transfer" {
 		fmt.Println("Input tidak valid!")
 		fmt.Println("Mohon lakukan pengisian ulang sesuai aturan pilihan yang tertera")
 		fmt.Printf("%-35s: ", "Metode Pembayaran (cash/transfer)")
-		fmt.Scan(&A[idx].metode_pembayaran)
+		fmt.Scan(&metodePembayaran)
+		if metodePembayaran == "back" {
+			fmt.Println("Kembali ke menu...")
+			return true
+		}
 	}
 
 	fmt.Printf("%-35s: ", "Tanggal Pembayaran (dd-mm-yyyy)")
-	fmt.Scan(&A[idx].tgl_pembayaran)
-	for !IsDateValid(A[idx].tgl_pembayaran) {
+	fmt.Scan(&tglPembayaran)
+	if tglPembayaran == "back" {
+		fmt.Println("Kembali ke menu...")
+		return true
+	}
+	for !IsDateValid(tglPembayaran) {
 		fmt.Println("Input tidak valid!")
 		fmt.Printf("%-35s: ", "Tanggal Pembayaran (dd-mm-yyyy)")
-		fmt.Scan(&A[idx].tgl_pembayaran)
+		fmt.Scan(&tglPembayaran)
+		if tglPembayaran == "back" {
+			fmt.Println("Kembali ke menu...")
+			return true
+		}
 	}
 
 	fmt.Printf("%-35s: ", "Status (Lunas/Belum)")
-	fmt.Scan(&A[idx].status)
-	for A[idx].status != "Lunas" && A[idx].status != "Belum" {
+	fmt.Scan(&status)
+	if status == "back" {
+		fmt.Println("Kembali ke menu...")
+		return true
+	}
+	for status != "Lunas" && status != "Belum" {
 		fmt.Println("Input tidak valid!")
 		fmt.Println("Mohon lakukan pengisian ulang sesuai aturan pilihan yang tertera")
 		fmt.Printf("%-35s: ", "Status (Lunas/Belum)")
-		fmt.Scan(&A[idx].status)
+		fmt.Scan(&status)
+		if status == "back" {
+			fmt.Println("Kembali ke menu...")
+			return true
+		}
 	}
 
-	// Cek saldo setelah semua input selesai
 	totalUtangBaru := totalUtangLain
-	if A[idx].status == "Belum" || A[idx].status == "belum" {
-		totalUtangBaru += A[idx].biaya
+	if status == "Belum" || status == "belum" {
+		totalUtangBaru += biaya
 	}
 
 	if totalUtangBaru > tabungan {
 		fmt.Println("Saldo anda tidak cukup dengan perubahan ini!")
 		fmt.Printf("Total utang akan menjadi: Rp%d, sedangkan saldo: Rp%d\n", totalUtangBaru, tabungan)
-		// Kembalikan nilai lama
-		A[idx].biaya = biayaLama
-		A[idx].status = statusLama
-		return
+		fmt.Println("Edit dibatalkan!")
+		return false
 	}
 
-	fmt.Println("=======================================")
-	fmt.Println("Selamat! Anda berhasil mengedit data")
+	fmt.Println("\n========== KONFIRMASI PERUBAHAN ==========")
+	fmt.Printf("Data Lama: %s - Rp%d - %s - %s - %s\n", 
+		dataAsli.nama_layanan, dataAsli.biaya, dataAsli.metode_pembayaran, 
+		dataAsli.tgl_pembayaran, dataAsli.status)
+	fmt.Printf("Data Baru: %s - Rp%d - %s - %s - %s\n", 
+		namaLayanan, biaya, metodePembayaran, tglPembayaran, status)
+	fmt.Print("Apakah Anda yakin ingin menyimpan perubahan? (ya/tidak): ")
+	fmt.Scan(&konfirmasi)
+
+	if konfirmasi == "ya" || konfirmasi == "Ya" || konfirmasi == "YES" || konfirmasi == "yes" {
+		A[idx].nama_layanan = namaLayanan
+		A[idx].biaya = biaya
+		A[idx].metode_pembayaran = metodePembayaran
+		A[idx].tgl_pembayaran = tglPembayaran
+		A[idx].status = status
+		
+		fmt.Println("=======================================")
+		fmt.Println("Selamat! Anda berhasil mengedit data")
+	} else {
+		fmt.Println("Edit dibatalkan!")
+	}
+	return false
 }
 
 func cekIsiArray(A *tabInt) int {
@@ -179,11 +242,9 @@ func sortArray(A *tabInt, jumlah int) {
 		A[maxIdx] = temp
 		i = i + 1
 	}
-	// Setelah sort, perbaiki nomor urut
 	reorderNumbers(A, jumlah)
 }
 
-// Fungsi untuk menghitung selisih hari antara dua tanggal
 func hitungSelisihHari(tanggal1, tanggal2 string) int {
 	layout := "02-01-2006"
 	t1, err1 := time.Parse(layout, tanggal1)
@@ -252,7 +313,6 @@ func rekomendasiPengeluaran(A *tabInt, jumlah int) {
 	}
 }
 
-// Fungsi untuk mengurutkan ulang nomor setelah hapus/edit
 func reorderNumbers(A *tabInt, jumlah int) {
 	for i := 0; i < jumlah; i++ {
 		A[i].no = i + 1
@@ -355,8 +415,11 @@ func menu(A *tabInt) {
 			fmt.Println("============ EDIT PAGE ===============")
 			fmt.Print("Baris nomor berapa yang ingin diubah? ")
 			fmt.Scan(&index)
-			editArray(A, tabungan, index, &isiArr)
-			tampilkanArray(*A, isiArr)
+			backToMenu := editArray(A, tabungan, index-1, &isiArr) 
+			if backToMenu {
+			} else {
+				tampilkanArray(*A, isiArr)
+			}
 		case 4:
 			fmt.Println("============ SORT PAGE ===============")
 			sortArray(A, isiArr)
