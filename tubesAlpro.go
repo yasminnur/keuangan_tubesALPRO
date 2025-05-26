@@ -447,7 +447,7 @@ func searchData(A *tabLayanan, keyword string, jumlah int) {
 func menu(A *tabLayanan) {
 	var pil, isiArr int
 	var tabungan int
-	tabungan = 50000
+	tabungan = 5000000
 	pil = 0
 	dummyData(A)
 	isiArr = cekIsiArray(A)
