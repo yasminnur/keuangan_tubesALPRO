@@ -14,9 +14,9 @@ type layanan_berlangganan struct {
 	status            string
 }
 
-const NMAX int = 10
+const NMAX int = 20
 
-type tabInt [NMAX]layanan_berlangganan
+type tabLayanan [NMAX]layanan_berlangganan
 
 var jumlah int = 0
 
@@ -35,19 +35,19 @@ func IsDateValid(dateStr string) bool {
 	return checkStr == dateStr
 }
 // TAMPILKAN ISI ARRAY 
-func tampilkanArray(A tabInt, jumlah int) {
+func tampilkanArray(A tabLayanan, jumlah int) {
 	fmt.Println("---------------------------------------------------------------------------------------------")
-	fmt.Printf("%-4s | %-20s | %-12s | %-10s | %-20s | %-10s | \n", "No", "Nama Layanan", "Biaya", "Metode", "Tanggal Pembayaran", "Status")
+	fmt.Printf("|%-4s | %-20s | %-12s | %-10s | %-20s | %-10s | \n", "No", "Nama Layanan", "Biaya", "Metode", "Tanggal Pembayaran", "Status")
 	fmt.Println("---------------------------------------------------------------------------------------------")
 	for i := 0; i < jumlah; i++ {
-		fmt.Printf("%-4d | %-20s | Rp%-10d | %-10s | %-20s | %-10s | \n", A[i].no, A[i].nama_layanan, A[i].biaya, A[i].metode_pembayaran, A[i].tgl_pembayaran, A[i].status)
+		fmt.Printf("|%-4d | %-20s | Rp%-10d | %-10s | %-20s | %-10s | \n", A[i].no, A[i].nama_layanan, A[i].biaya, A[i].metode_pembayaran, A[i].tgl_pembayaran, A[i].status)
 	}
 	fmt.Println("---------------------------------------------------------------------------------------------")
 	fmt.Println()
 	fmt.Println("Jumlah Data : ", jumlah)
 }
 
-func tambahLayanan(A *tabInt, tabungan int, jumlah *int) {
+func tambahLayanan(A *tabLayanan, tabungan int, jumlah *int) {
 	var idx int
 	idx = *jumlah
 	fmt.Printf("%-35s: ", "Nama Layanan")
@@ -90,7 +90,7 @@ func tambahLayanan(A *tabInt, tabungan int, jumlah *int) {
 }
 
 
-func editStrip(A *tabInt, tabungan int, idx int, jumlah *int) bool {
+func editStrip(A *tabLayanan, tabungan int, idx int, jumlah *int) bool {
 	if idx < 0 || idx >= *jumlah {
 		fmt.Println("Nomor layanan tidak valid!")
 		return false
@@ -304,7 +304,7 @@ func editStrip(A *tabInt, tabungan int, idx int, jumlah *int) bool {
 // 	}
 // }
 
-func cekIsiArray(A *tabInt) int {
+func cekIsiArray(A *tabLayanan) int {
 	var jmlh int
 	for i := 0; i < NMAX && A[i].no != 0; i++ {
 		jmlh++
@@ -312,7 +312,7 @@ func cekIsiArray(A *tabInt) int {
 	return jmlh
 }
 
-func sortArray(A *tabInt, jumlah int) {
+func sortArray(A *tabLayanan, jumlah int) {
 	var i int = 0
 	for i < jumlah-1 {
 		var maxIdx int = i
@@ -342,7 +342,7 @@ func hitungSelisihHari(tanggal1, tanggal2 string) int {
 	return int(selisih.Hours() / 24)
 }
 
-func cekJatuhTempo(A *tabInt, jumlah int) {
+func cekJatuhTempo(A *tabLayanan, jumlah int) {
 	var hariIni string
 	hariIni = "20-05-2025"
 	fmt.Println("⏰ Status jatuh tempo layanan: ")
@@ -373,7 +373,7 @@ func cekJatuhTempo(A *tabInt, jumlah int) {
 	}
 }
 
-func rekomendasiPengeluaran(A *tabInt, jumlah int) {
+func rekomendasiPengeluaran(A *tabLayanan, jumlah int) {
 	fmt.Println("📉 Rekomendasi layanan yang dapat dihentikan berdasarkan harga termahal:")
 	if jumlah == 0 {
 		fmt.Println("Tidak ada layanan yang tersedia")
@@ -397,13 +397,13 @@ func rekomendasiPengeluaran(A *tabInt, jumlah int) {
 	}
 }
 
-func reorderNumbers(A *tabInt, jumlah int) {
+func reorderNumbers(A *tabLayanan, jumlah int) {
 	for i := 0; i < jumlah; i++ {
 		A[i].no = i + 1
 	}
 }
 
-func hapusLayanan(A *tabInt, idx int, jumlah *int) {
+func hapusLayanan(A *tabLayanan, idx int, jumlah *int) {
 	var index int = idx - 1
 	if index < 0 || index >= *jumlah {
 		fmt.Println("Nomor layanan tidak valid!")
@@ -423,7 +423,7 @@ func hapusLayanan(A *tabInt, idx int, jumlah *int) {
 	fmt.Println("Layanan berhasil dihapus!")
 }
 
-func searchData(A *tabInt, keyword string, jumlah int) {
+func searchData(A *tabLayanan, keyword string, jumlah int) {
 	var ketemu int
 	fmt.Printf("%-4s %-20s %-12s %-10s %-20s %-10s\n", "No", "Nama Layanan", "Biaya", "Metode", "Tanggal Pembayaran", "Status")
 	fmt.Println("------------------------------------------------------------------------------------")
@@ -444,17 +444,19 @@ func searchData(A *tabInt, keyword string, jumlah int) {
 // 4. apakah bisa menambah layanan yg sama di bulan yg sama?
 // 5. edit tidak lgsg semua kolom, sesuai yg ingin user edit (DONE)
 
-func menu(A *tabInt) {
+func menu(A *tabLayanan) {
 	var pil, isiArr int
 	var tabungan int
 	tabungan = 50000
 	pil = 0
-	loadData(A)
+	dummyData(A)
 	isiArr = cekIsiArray(A)
 
 	for pil != 9 {
 		fmt.Println()
-		fmt.Println("===================== MENU ========================")
+		fmt.Printf("=============================================================================================\n")
+		fmt.Printf("					DATA MENU\n")
+		fmt.Printf("=============================================================================================\n")
 		fmt.Println("1. Tampilkan Daftar Layanan")
 		fmt.Println("2. Tambahkan Daftar Layanan")
 		fmt.Println("3. Edit Daftar Layanan")
@@ -464,14 +466,16 @@ func menu(A *tabInt) {
 		fmt.Println("7. Hapus Layanan")
 		fmt.Println("8. Search Daftar Layanan")
 		fmt.Println("9. Keluar")
-		fmt.Println("====================================================")
-		fmt.Print("Pilih : ")
+		// fmt.Printf("=============================================================================================\n")
+		fmt.Print("\nPilih : ")
 		fmt.Scan(&pil)
 		fmt.Println()
 
 		switch pil {
 		case 1:
-			fmt.Println("====================================== DATA PAGE ============================================\n")
+			fmt.Printf("=============================================================================================\n")
+			fmt.Printf("					DATA PAGE\n")
+			fmt.Printf("=============================================================================================\n")
 			tampilkanArray(*A, isiArr)
 		case 2:
 			fmt.Println("======================================= ADD PAGE ============================================\n")
@@ -541,18 +545,20 @@ func menu(A *tabInt) {
 	}
 }
 
-func loadData(data *tabInt) {
-	*data = tabInt{
-		{1, "Netflix", 10000, "transfer", "25-05-2025", "Belum"},
-		{2, "Spotify", 8000, "cash", "19-05-2025", "Belum"},
-		{3, "YouTube Premium", 30000, "transfer", "30-05-2025", "Belum"},
-		{4, "Disney+", 1100, "cash", "15-06-2025", "Lunas"},
-		{5, "Amazon Prime", 5000, "transfer", "20-06-2025", "Lunas"},
-		{6, "HBO Max", 5000, "cash", "25-06-2025", "Lunas"},
-	}
+func dummyData(A *tabLayanan) {
+	A[0] = layanan_berlangganan{1, "Netflix", 54000, "transfer", "25-05-2025", "Belum"}
+    A[1] = layanan_berlangganan{2, "Spotify Premium", 54000, "cash", "19-05-2025", "Belum"}
+    A[2] = layanan_berlangganan{3, "YouTube Premium", 59000, "transfer", "30-05-2025", "Belum"}
+    A[3] = layanan_berlangganan{4, "Disney+ Hotstar", 39000, "cash", "15-06-2025", "Lunas"}
+    A[4] = layanan_berlangganan{5, "Amazon Prime Video", 59000, "transfer", "20-06-2025", "Lunas"}
+    A[5] = layanan_berlangganan{6, "HBO Max", 79000, "cash", "25-06-2025", "Lunas"}
+    A[6] = layanan_berlangganan{7, "Canva Pro", 150000, "transfer", "10-07-2025", "Belum"}
+    A[7] = layanan_berlangganan{8, "Adobe Creative Cloud", 287000, "transfer", "05-07-2025", "Belum"}
+    A[8] = layanan_berlangganan{9, "Microsoft 365", 119000, "cash", "12-07-2025", "Lunas"}
+    A[9] = layanan_berlangganan{10, "Zoom Pro", 149000, "transfer", "18-07-2025", "Belum"}
 }
 
-func hitUtang(A tabInt, tabungan, jumlah int) (bool, int) {
+func hitUtang(A tabLayanan, tabungan, jumlah int) (bool, int) {
 	var utang int
 	for i := 0; i < jumlah; i++ {
 		if A[i].status != "Lunas" && A[i].status != "lunas" {
@@ -562,7 +568,7 @@ func hitUtang(A tabInt, tabungan, jumlah int) (bool, int) {
 	return utang < tabungan, utang
 }
 
-func hitPengeluaran(A tabInt, jumlah int) int {
+func hitPengeluaran(A tabLayanan, jumlah int) int {
 	var pengeluaran int
 	for i := 0; i < jumlah; i++ {
 		pengeluaran += A[i].biaya
@@ -571,6 +577,6 @@ func hitPengeluaran(A tabInt, jumlah int) int {
 }
 
 func main() {
-	var data tabInt
+	var data tabLayanan
 	menu(&data)
 }
