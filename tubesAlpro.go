@@ -342,6 +342,19 @@ func reorderNumbers(A *tabLayanan, jumlah int) {
 	}
 }
 
+func toLower(input string) string {
+	result := ""
+	for _, ch := range input {
+		if ch >= 'A' && ch <= 'Z' {
+			result += string(ch + ('a' - 'A'))
+		} else {
+			result += string(ch)
+		}
+	}
+	return result
+}
+
+
 func hapusLayanan(A *tabLayanan, idx int, jumlah *int) {
 	var index int = idx - 1
 	if index < 0 || index >= *jumlah {
