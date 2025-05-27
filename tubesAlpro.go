@@ -48,11 +48,15 @@ func tampilkanArray(A tabLayanan, jumlah int) {
 	fmt.Println("Jumlah Data : ", jumlah)
 }
 
-func tambahLayanan(A *tabLayanan, tabungan int, jumlah *int) {
+func tambahLayanan(A *tabLayanan, tabungan int, jumlah *int) bool {
 	var idx int
 	idx = *jumlah
 	fmt.Printf("%-35s: ", "Nama Layanan")
 	fmt.Scan(&A[idx].nama_layanan)
+	if A[idx].nama_layanan == "back" {
+		fmt.Println("Kembali ke menu...")
+		return true
+	}
 	fmt.Printf("%-35s: ", "Harga")
 	fmt.Scan(&A[idx].biaya)
 	_, utang := hitUtang(*A, tabungan, *jumlah)
@@ -62,32 +66,54 @@ func tambahLayanan(A *tabLayanan, tabungan int, jumlah *int) {
 	} else {
 		fmt.Printf("%-35s: ", "Metode Pembayaran (cash/transfer)")
 		fmt.Scan(&A[idx].metode_pembayaran)
+		if A[idx].metode_pembayaran == "back" {
+			fmt.Println("Kembali ke menu...")
+			return true
+		}
 		for A[idx].metode_pembayaran != "cash" && A[idx].metode_pembayaran != "transfer" {
 			fmt.Println("Input tidak valid!")
 			fmt.Println("Mohon lakukan pengisian ulang sesuai aturan pilihan yang tertera")
 			fmt.Printf("%-35s: ", "Metode Pembayaran (cash/transfer)")
 			fmt.Scan(&A[idx].metode_pembayaran)
+			if A[idx].metode_pembayaran == "back" {
+				fmt.Println("Kembali ke menu...")
+				return true
+			}
 		}
 		fmt.Printf("%-35s: ", "Tanggal Pembayaran (dd-mm-yyyy)")
 		fmt.Scan(&A[idx].tgl_pembayaran)
+
 		for !IsDateValid(A[idx].tgl_pembayaran) {
 			fmt.Println("Input tidak valid!")
 			fmt.Printf("%-35s: ", "Tanggal Pembayaran (dd-mm-yyyy)")
 			fmt.Scan(&A[idx].tgl_pembayaran)
+			if A[idx].tgl_pembayaran == "back" {
+				fmt.Println("Kembali ke menu...")
+				return true
+			}
 		}
 		fmt.Printf("%-35s: ", "Status (Lunas/Belum)")
 		fmt.Scan(&A[idx].status)
+		if A[idx].status == "back" {
+			fmt.Println("Kembali ke menu...")
+			return true
+		}
 		for A[idx].status != "Lunas" && A[idx].status != "Belum" {
 			fmt.Println("Input tidak valid!")
 			fmt.Println("Mohon lakukan pengisian ulang sesuai aturan pilihan yang tertera")
 			fmt.Printf("%-35s: ", "Status (Lunas/Belum)")
 			fmt.Scan(&A[idx].status)
+			if A[idx].status == "back" {
+				fmt.Println("Kembali ke menu...")
+				return true
+			}
 		}
 		A[idx].no = idx + 1
 		*jumlah = *jumlah + 1
 		fmt.Println("=======================================")
 		fmt.Println("Selamat! Anda berhasil menambahkan data")
 	}
+	return false
 }
 
 func editStrip(A *tabLayanan, tabungan int, idx int, jumlah *int) bool {
@@ -214,13 +240,6 @@ func editStrip(A *tabLayanan, tabungan int, idx int, jumlah *int) bool {
 	fmt.Println("---------------------------------------------------------------------------------------------")
 	fmt.Printf("|%-4d | %-20s | Rp%-10d | %-10s | %-20s | %-10s | \n", A[idx].no, dataAsli.nama_layanan, dataAsli.biaya, dataAsli.metode_pembayaran, dataAsli.tgl_pembayaran, dataAsli.status)
 	fmt.Println("---------------------------------------------------------------------------------------------")
-	// fmt.Printf("%-20s %-12s %-10s %-20s %-10s\n", "Nama Layanan", "Biaya", "Metode", "Tanggal Pembayaran", "Status")
-	// fmt.Println("------------------------------------------------------------------------------------")
-	// fmt.Printf("%-20s Rp%-10d %-10s %-20s %-10s\n",
-	// 	dataAsli.nama_layanan, dataAsli.biaya, dataAsli.metode_pembayaran,
-	// 	dataAsli.tgl_pembayaran, dataAsli.status)
-	// fmt.Printf("Data Baru: %s - Rp%d - %s - %s - %s\n",
-	// 	namaLayanan, biaya, metodePembayaran, tglPembayaran, status)
 	fmt.Println("Data Baru: ")
 	fmt.Println("---------------------------------------------------------------------------------------------")
 	fmt.Printf("|%-4s | %-20s | %-12s | %-10s | %-20s | %-10s | \n", "No", "Nama Layanan", "Biaya", "Metode", "Tanggal Pembayaran", "Status")
@@ -253,6 +272,7 @@ func cekIsiArray(A *tabLayanan) int {
 	return jmlh
 }
 
+// selection sort descending
 func sortArray(A *tabLayanan, jumlah int) {
 	var i int = 0
 	for i < jumlah-1 {
@@ -358,10 +378,10 @@ func hapusLayanan(A *tabLayanan, idx int, jumlah *int) {
 
 	// Perbaiki nomor urut setelah hapus
 	reorderNumbers(A, *jumlah)
-
 	fmt.Println("Layanan berhasil dihapus!")
 }
 
+// sequential search
 func searchData(A *tabLayanan, keyword string, jumlah int) {
 	var ketemu int
 	fmt.Println("---------------------------------------------------------------------------------------------")
@@ -384,12 +404,8 @@ func searchData(A *tabLayanan, keyword string, jumlah int) {
 func menu(A *tabLayanan) {
 	var pil, isiArr int
 	var tabungan int
-// <<<<<<< HEAD
-	// tabungan = 5000000
-// =======
 	fmt.Print("masukan nominal tabungan: ")
 	fmt.Scan(&tabungan)
-// >>>>>>> 0cf4d86697df638cfd50520326cb36c201f024fb
 	pil = 0
 	dummyData(A)
 	isiArr = cekIsiArray(A)
@@ -438,7 +454,11 @@ func menu(A *tabLayanan) {
 			}
 			ok, utang := hitUtang(*A, tabungan, isiArr)
 			if ok {
-				tambahLayanan(A, tabungan, &isiArr)
+				backToMenu := tambahLayanan(A, tabungan, &isiArr)
+				if !backToMenu {
+					tampilkanArray(*A, isiArr)
+				}
+
 			} else {
 				fmt.Println("Saldo anda tidak cukup!")
 				fmt.Println("Uang anda saat ini: ", tabungan)
@@ -537,5 +557,6 @@ func main() {
 	var data tabLayanan
 	menu(&data)
 }
+
 // fitur back minus
 // lower up case to
