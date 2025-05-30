@@ -124,7 +124,6 @@ func editStrip(A *tabLayanan, tabungan int, idx int, jumlah *int) bool {
 	dataAsli := A[idx]
 	var namaLayanan, metodePembayaran, tglPembayaran, status string
 	var biaya int
-	var biayaStr string
 	var konfirmasi string
 	fmt.Printf("Data no-%d saat ini: \n", idx+1)
 	fmt.Println("---------------------------------------------------------------------------------------------")
@@ -142,15 +141,14 @@ func editStrip(A *tabLayanan, tabungan int, idx int, jumlah *int) bool {
 		namaLayanan = dataAsli.nama_layanan
 	}
 	fmt.Printf("%-35s: ", "Biaya")
-	fmt.Scan(&biayaStr)
-	if biayaStr == "back" {
+	fmt.Scan(&biaya)
+	if biaya == -2 {
 		fmt.Println("Kembali ke menu...")
 		return true
 	}
-	if biayaStr == "-" {
+	if biaya == -1 {
 		biaya = dataAsli.biaya
 	}
-	fmt.Scanf(biayaStr, "%d", &biaya)
 	fmt.Printf("%-35s: ", "Metode Pembayaran (cash/transfer)")
 	fmt.Scan(&metodePembayaran)
 	if metodePembayaran == "back" {
@@ -274,21 +272,47 @@ func cekIsiArray(A *tabLayanan) int {
 
 // selection sort descending
 func sortArray(A *tabLayanan, jumlah int) {
+	var sort int
+	fmt.Println("Urutkan berdasarkan : ")
+	fmt.Println("    1. Biaya terbesar ke biaya terkecil")
+	fmt.Println("    2. Biaya terkecil ke biaya terbesar")
+	fmt.Print("Pilih nomor : ")
+	fmt.Scan(&sort)
 	var i int = 0
-	for i < jumlah-1 {
-		var maxIdx int = i
-		var j int = i + 1
-		for j < jumlah {
-			if A[j].biaya > A[maxIdx].biaya {
-				maxIdx = j
+	if sort == 1 {
+		for i < jumlah-1 {
+			var maxIdx int = i
+			var j int = i + 1
+			for j < jumlah {
+				if A[j].biaya > A[maxIdx].biaya {
+					maxIdx = j
+				}
+				j = j + 1
 			}
-			j = j + 1
+			var temp layanan_berlangganan = A[i]
+			A[i] = A[maxIdx]
+			A[maxIdx] = temp
+			i = i + 1
 		}
-		var temp layanan_berlangganan = A[i]
-		A[i] = A[maxIdx]
-		A[maxIdx] = temp
-		i = i + 1
+	} else if sort == 2 {
+		for i < jumlah-1 {
+			var maxIdx int = i
+			var j int = i + 1
+			for j < jumlah {
+				if A[j].biaya < A[maxIdx].biaya {
+					maxIdx = j
+				}
+				j = j + 1
+			}
+			var temp layanan_berlangganan = A[i]
+			A[i] = A[maxIdx]
+			A[maxIdx] = temp
+			i = i + 1
+		}
+	} else {
+		fmt.Println("Input tidak valid!")
 	}
+	
 	reorderNumbers(A, jumlah)
 }
 
@@ -417,7 +441,7 @@ func searchData(A *tabLayanan, keyword string, jumlah int) {
 func menu(A *tabLayanan) {
 	var pil, isiArr int
 	var tabungan int
-	fmt.Print("masukan nominal tabungan: ")
+	fmt.Print("Masukan nominal tabungan: ")
 	fmt.Scan(&tabungan)
 	pil = 0
 	dummyData(A)
@@ -437,7 +461,6 @@ func menu(A *tabLayanan) {
 		fmt.Println("7. Hapus Layanan")
 		fmt.Println("8. Search Daftar Layanan")
 		fmt.Println("9. Keluar")
-		// fmt.Printf("=============================================================================================\n")
 		fmt.Print("\nPilih : ")
 		fmt.Scan(&pil)
 		fmt.Println()
@@ -445,12 +468,12 @@ func menu(A *tabLayanan) {
 		switch pil {
 		case 1:
 			fmt.Printf("=============================================================================================\n")
-			fmt.Printf("					DATA PAGE\n")
+			fmt.Printf("				📃 DATA PAGE 📃\n")
 			fmt.Printf("=============================================================================================\n")
 			tampilkanArray(*A, isiArr)
 		case 2:
 			fmt.Printf("=============================================================================================\n")
-			fmt.Printf("					ADD PAGE\n")
+			fmt.Printf("				📝 ADD PAGE 📝\n")
 			fmt.Printf("=============================================================================================\n")
 			var move string
 			var index int
@@ -482,8 +505,9 @@ func menu(A *tabLayanan) {
 			var index int
 			tampilkanArray(*A, isiArr)
 			fmt.Printf("=============================================================================================\n")
-			fmt.Printf("					EDIT PAGE\n")
+			fmt.Printf("				🧼 EDIT PAGE 🧼\n")
 			fmt.Printf("               (Gunakan tanda '-' jika tidak ada data yang ingin diisi)\n")
+			fmt.Printf("(Catatan untuk bagian biaya! ketik -1 jika tidak ingin mengubah nilai, ketik -2 untuk kembali ke menu)\n")
 			fmt.Printf("=============================================================================================\n")
 			fmt.Print("Baris nomor berapa yang ingin diubah? ")
 			fmt.Scan(&index)
@@ -494,25 +518,25 @@ func menu(A *tabLayanan) {
 			}
 		case 4:
 			fmt.Printf("=============================================================================================\n")
-			fmt.Printf("					SORT PAGE\n")
+			fmt.Printf("				📈 SORT PAGE 📉\n")
 			fmt.Printf("=============================================================================================\n")
 			sortArray(A, isiArr)
 			tampilkanArray(*A, isiArr)
 		case 5:
 			fmt.Printf("=============================================================================================\n")
-			fmt.Printf("					CEK JATUH TEMPO PAGE\n")
+			fmt.Printf("				⏰ CEK JATUH TEMPO PAGE ⏰\n")
 			fmt.Printf("=============================================================================================\n")
 			cekJatuhTempo(A, isiArr)
 		case 6:
 			fmt.Printf("=============================================================================================\n")
-			fmt.Printf("					REKOMENDASI PAGE\n")
+			fmt.Printf("				👩‍⚕️ REKOMENDASI PAGE\n")
 			fmt.Printf("=============================================================================================\n")
 			rekomendasiPengeluaran(A, isiArr)
 		case 7:
 			var index int
 			tampilkanArray(*A, isiArr)
 			fmt.Printf("=============================================================================================\n")
-			fmt.Printf("					DELETE PAGE\n")
+			fmt.Printf("				🗑️ DELETE PAGE 🗑️\n")
 			fmt.Printf("=============================================================================================\n")
 			fmt.Print("Baris nomor berapa yang ingin dihapus? ")
 			fmt.Scan(&index)
@@ -522,13 +546,13 @@ func menu(A *tabLayanan) {
 		case 8:
 			var keyword string
 			fmt.Printf("=============================================================================================\n")
-			fmt.Printf("					SEARCH PAGE\n")
+			fmt.Printf("				🔍 SEARCH PAGE 🔍\n")
 			fmt.Printf("=============================================================================================\n")
 			fmt.Print("Cari data berdasarkan nama layanan / tanggal pembayaran / status : ")
 			fmt.Scan(&keyword)
 			searchData(A, keyword, isiArr)
 		case 9:
-			fmt.Println("Terima kasih telah menggunakan program ini!")
+			fmt.Println("🙏 Terima kasih telah menggunakan program ini! 🙏")
 		default:
 			fmt.Println("Pilihan tidak valid!")
 		}
@@ -568,8 +592,8 @@ func hitPengeluaran(A tabLayanan, jumlah int) int {
 
 func main() {
 	var data tabLayanan
+	fmt.Println()
+	fmt.Println("🙌 Hai, Selamat Datang di situs pencatatan keuangan 🙌")
 	menu(&data)
 }
 
-// fitur back minus
-// lower up case to
