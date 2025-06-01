@@ -116,7 +116,7 @@ func tambahLayanan(A *tabLayanan, tabungan int, jumlah *int) bool {
 	return false
 }
 
-func editStrip(A *tabLayanan, tabungan int, idx int, jumlah *int) bool {
+func editData(A *tabLayanan, tabungan int, idx int, jumlah *int) bool {
 	if idx < 0 || idx >= *jumlah {
 		fmt.Println("Nomor layanan tidak valid!")
 		return false
@@ -356,7 +356,7 @@ func cekJatuhTempo(A *tabLayanan, jumlah int) {
 	}
 }
 
-func rekomendasiPengeluaran(A *tabLayanan, jumlah int) {
+func rekomendasiPemberhentian(A *tabLayanan, jumlah int) {
 	fmt.Println("📉 Rekomendasi layanan yang dapat dihentikan berdasarkan harga termahal:")
 	if jumlah == 0 {
 		fmt.Println("Tidak ada layanan yang tersedia")
@@ -385,19 +385,6 @@ func reorderNumbers(A *tabLayanan, jumlah int) {
 		A[i].no = i + 1
 	}
 }
-
-func toLower(input string) string {
-	result := ""
-	for _, ch := range input {
-		if ch >= 'A' && ch <= 'Z' {
-			result += string(ch + ('a' - 'A'))
-		} else {
-			result += string(ch)
-		}
-	}
-	return result
-}
-
 
 func hapusLayanan(A *tabLayanan, idx int, jumlah *int) {
 	var index int = idx - 1
@@ -511,7 +498,7 @@ func menu(A *tabLayanan) {
 			fmt.Printf("=============================================================================================\n")
 			fmt.Print("Baris nomor berapa yang ingin diubah? ")
 			fmt.Scan(&index)
-			backToMenu := editStrip(A, tabungan, index-1, &isiArr)
+			backToMenu := editData(A, tabungan, index-1, &isiArr)
 			if backToMenu {
 			} else {
 				tampilkanArray(*A, isiArr)
@@ -531,7 +518,7 @@ func menu(A *tabLayanan) {
 			fmt.Printf("=============================================================================================\n")
 			fmt.Printf("				👩‍⚕️ REKOMENDASI PAGE\n")
 			fmt.Printf("=============================================================================================\n")
-			rekomendasiPengeluaran(A, isiArr)
+			rekomendasiPemberhentian(A, isiArr)
 		case 7:
 			var index int
 			tampilkanArray(*A, isiArr)
@@ -580,14 +567,6 @@ func hitUtang(A tabLayanan, tabungan, jumlah int) (bool, int) {
 		}
 	}
 	return utang < tabungan, utang
-}
-
-func hitPengeluaran(A tabLayanan, jumlah int) int {
-	var pengeluaran int
-	for i := 0; i < jumlah; i++ {
-		pengeluaran += A[i].biaya
-	}
-	return pengeluaran
 }
 
 func main() {
